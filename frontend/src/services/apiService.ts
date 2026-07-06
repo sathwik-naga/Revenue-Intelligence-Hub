@@ -1,7 +1,7 @@
 import { Transaction, FinancialSummary } from '../types';
 
 // Placeholder base API URL for FastAPI backend
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://`${API_URL}/...`/api';
 
 class ApiService {
   private useMockMode = true;
