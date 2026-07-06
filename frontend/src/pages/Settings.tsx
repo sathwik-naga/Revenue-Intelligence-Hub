@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+const API_URL = import.meta.env.VITE_API_URL;
+
 import {
   User,
   Sliders,
@@ -185,7 +187,7 @@ export const Settings: React.FC = () => {
               <h4 className="font-bold text-xs uppercase tracking-wider">FastAPI & Firebase Status</h4>
             </div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
-              Platform is running in Local Sandbox (Mock Mode). Remote REST endpoints are configured to point to http://localhost:8000/api.
+              Platform is running in Local Sandbox (Mock Mode). Remote REST endpoints are configured to point to http://`${API_URL}/...`/api.
             </p>
             <div className="flex items-center gap-1.5 text-[10px] text-emerald-500 font-bold bg-emerald-50 dark:bg-emerald-950/20 px-2 py-1 rounded-lg w-max">
               <CheckCircle size={12} />

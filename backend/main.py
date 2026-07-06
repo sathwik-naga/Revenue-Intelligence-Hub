@@ -1,26 +1,17 @@
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
 from models import AnalyzeRequest, ChatRequest
 from ai_service import analyze_financials, ask_ai
 
-app = FastAPI(title="Revenue Intelligence Hub API")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-# Allow your React frontend
+app = FastAPI(title="Revenue Intelligence Hub API")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
+        "https://revenue-intelligence-hub-7we8.vercel.app",  # replace with your actual Vercel URL
     ],
     allow_credentials=True,
     allow_methods=["*"],
