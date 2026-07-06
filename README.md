@@ -10,6 +10,19 @@ Revenue Intelligence Hub helps businesses make smarter financial decisions by au
 
 ---
 
+## 🚀 Demo Access
+
+Option 1:
+- Click **Access Demo Workspace** to explore the application without logging in.
+
+Option 2:
+Use the demo credentials below.
+
+Email::-
+admin@revenuehub.com
+Password:
+admin123
+
 ## ✨ Features
 
 - 🤖 AI-Powered Financial Health Reports
