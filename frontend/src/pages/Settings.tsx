@@ -12,16 +12,27 @@ import {
 } from 'lucide-react';
 
 export const Settings: React.FC = () => {
-  const { user, addToast } = useApp();
+  const { user, addToast, notificationPreferences, saveNotificationPreferences } = useApp();
   const [userName, setUserName] = useState(user?.name || 'Workspace User');
   const [businessName, setBusinessName] = useState('Acme Corp Inc.');
   const [anomalyThreshold, setAnomalyThreshold] = useState('1000');
   const [currencySymbol, setCurrencySymbol] = useState('USD');
   
-  // Toggle states
-  const [emailAlerts, setEmailAlerts] = useState(true);
-  const [infraAlerts, setInfraAlerts] = useState(true);
-  const [aiPredictions, setAiPredictions] = useState(true);
+  const [whatsappPhone, setWhatsappPhone] = useState(notificationPreferences?.whatsappNumber || '');
+
+  React.useEffect(() => {
+    if (notificationPreferences?.whatsappNumber !== undefined) {
+      setWhatsappPhone(notificationPreferences.whatsappNumber);
+    }
+  }, [notificationPreferences?.whatsappNumber]);
+
+  const handlePreferenceChange = async (key: string, value: any) => {
+    const updated = {
+      ...notificationPreferences,
+      [key]: value
+    };
+    await saveNotificationPreferences(updated);
+  };
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,39 +153,98 @@ export const Settings: React.FC = () => {
 
         {/* Right Column: Toggle Switches */}
         <div className="space-y-6">
+          {/* Notification Preferences */}
           <div className="border border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md p-6 rounded-2xl shadow-sm space-y-4">
             <div className="flex items-center gap-2 text-slate-900 dark:text-white pb-3 border-b border-slate-100 dark:border-slate-800">
               <Bell size={18} className="text-blue-600" />
-              <h4 className="font-bold text-base">Alert Configurations</h4>
+              <h4 className="font-bold text-base">Notification Preferences</h4>
             </div>
 
             <div className="space-y-4 text-xs font-semibold text-slate-655 dark:text-slate-400">
               <label className="flex items-center justify-between cursor-pointer">
-                <span>Enable weekly email digests</span>
+                <span>Email Notifications</span>
                 <input
                   type="checkbox"
-                  checked={emailAlerts}
-                  onChange={(e) => setEmailAlerts(e.target.checked)}
+                  checked={!!notificationPreferences?.emailEnabled}
+                  onChange={(e) => handlePreferenceChange('emailEnabled', e.target.checked)}
                   className="rounded text-blue-600 focus:ring-blue-500 border-slate-200"
                 />
               </label>
 
               <label className="flex items-center justify-between cursor-pointer">
-                <span>Flag infrastructure spikes</span>
+                <span>WhatsApp Notifications</span>
                 <input
                   type="checkbox"
-                  checked={infraAlerts}
-                  onChange={(e) => setInfraAlerts(e.target.checked)}
+                  checked={!!notificationPreferences?.whatsappEnabled}
+                  onChange={(e) => handlePreferenceChange('whatsappEnabled', e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500 border-slate-200"
+                />
+              </label>
+
+              {notificationPreferences?.whatsappEnabled && (
+                <div className="space-y-2 pt-2 border-t border-white/5">
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider">
+                    WhatsApp Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    value={whatsappPhone}
+                    onChange={(e) => setWhatsappPhone(e.target.value)}
+                    onBlur={() => handlePreferenceChange('whatsappNumber', whatsappPhone)}
+                    placeholder="e.g. +919876543210"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 text-slate-850 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              )}
+
+              <div className="h-px bg-white/5 my-2" />
+
+              <label className="flex items-center justify-between cursor-pointer">
+                <span>Weekly digests</span>
+                <input
+                  type="checkbox"
+                  checked={!!notificationPreferences?.weeklySummary}
+                  onChange={(e) => handlePreferenceChange('weeklySummary', e.target.checked)}
                   className="rounded text-blue-600 focus:ring-blue-500 border-slate-200"
                 />
               </label>
 
               <label className="flex items-center justify-between cursor-pointer">
-                <span>Enable auto Gemini forecasting</span>
+                <span>AI CFO Alerts</span>
                 <input
                   type="checkbox"
-                  checked={aiPredictions}
-                  onChange={(e) => setAiPredictions(e.target.checked)}
+                  checked={!!notificationPreferences?.aiAlerts}
+                  onChange={(e) => handlePreferenceChange('aiAlerts', e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500 border-slate-200"
+                />
+              </label>
+
+              <label className="flex items-center justify-between cursor-pointer">
+                <span>Expense Auditing Alerts</span>
+                <input
+                  type="checkbox"
+                  checked={!!notificationPreferences?.expenseAlerts}
+                  onChange={(e) => handlePreferenceChange('expenseAlerts', e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500 border-slate-200"
+                />
+              </label>
+
+              <label className="flex items-center justify-between cursor-pointer">
+                <span>Profit Margin Alerts</span>
+                <input
+                  type="checkbox"
+                  checked={!!notificationPreferences?.profitAlerts}
+                  onChange={(e) => handlePreferenceChange('profitAlerts', e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500 border-slate-200"
+                />
+              </label>
+
+              <label className="flex items-center justify-between cursor-pointer">
+                <span>CSV Upload Completed Alerts</span>
+                <input
+                  type="checkbox"
+                  checked={!!notificationPreferences?.csvCompleted}
+                  onChange={(e) => handlePreferenceChange('csvCompleted', e.target.checked)}
                   className="rounded text-blue-600 focus:ring-blue-500 border-slate-200"
                 />
               </label>

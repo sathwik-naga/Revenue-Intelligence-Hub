@@ -15,28 +15,28 @@ interface ToastProps {
 
 export const Toast: React.FC<ToastProps> = ({ toasts, removeToast }) => {
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full">
+    <div className="fixed bottom-5 right-5 z-50 flex w-full max-w-sm flex-col gap-2 pointer-events-none">
       <AnimatePresence>
         {toasts.map((toast) => {
-          let bgColor = 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800';
-          let textColor = 'text-slate-800 dark:text-slate-200';
+          let bgColor = 'border-white/10 bg-slate-950/80';
+          let textColor = 'text-slate-100';
           let Icon = Info;
-          let iconColor = 'text-primary-500';
+          let iconColor = 'text-blue-300';
 
           switch (toast.type) {
             case 'success':
-              bgColor = 'bg-white dark:bg-slate-900 border-emerald-100 dark:border-emerald-950/30';
-              iconColor = 'text-emerald-500';
+              bgColor = 'border-emerald-400/20 bg-emerald-500/10';
+              iconColor = 'text-emerald-300';
               Icon = CheckCircle;
               break;
             case 'error':
-              bgColor = 'bg-white dark:bg-slate-900 border-rose-100 dark:border-rose-950/30';
-              iconColor = 'text-rose-500';
+              bgColor = 'border-rose-400/20 bg-rose-500/10';
+              iconColor = 'text-rose-300';
               Icon = XCircle;
               break;
             case 'warning':
-              bgColor = 'bg-white dark:bg-slate-900 border-amber-100 dark:border-amber-950/30';
-              iconColor = 'text-amber-500';
+              bgColor = 'border-amber-400/20 bg-amber-500/10';
+              iconColor = 'text-amber-300';
               Icon = AlertTriangle;
               break;
           }
@@ -45,21 +45,16 @@ export const Toast: React.FC<ToastProps> = ({ toasts, removeToast }) => {
             <motion.div
               key={toast.id}
               layout
-              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.85, transition: { duration: 0.2 } }}
-              className={`pointer-events-auto flex items-start gap-3 p-4 rounded-xl border shadow-lg glass-panel ${bgColor} ${textColor}`}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+              className={`pointer-events-auto flex items-start gap-3 rounded-[24px] border p-4 shadow-[0_20px_60px_rgba(2,6,23,0.35)] backdrop-blur-2xl ${bgColor} ${textColor}`}
             >
               <div className={`mt-0.5 shrink-0 ${iconColor}`}>
                 <Icon size={18} />
               </div>
-              <div className="flex-1 text-sm font-medium pr-1 leading-relaxed">
-                {toast.message}
-              </div>
-              <button
-                onClick={() => removeToast(toast.id)}
-                className="shrink-0 p-0.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-              >
+              <div className="flex-1 pr-1 text-sm font-medium leading-relaxed">{toast.message}</div>
+              <button onClick={() => removeToast(toast.id)} className="shrink-0 rounded-lg p-0.5 text-slate-400 transition hover:bg-white/10 hover:text-slate-100">
                 <X size={14} />
               </button>
             </motion.div>

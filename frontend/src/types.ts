@@ -1,7 +1,7 @@
 export interface Transaction {
   id: string;
   date: string;
-  description: string;
+  description?: string;
   category: string;
   amount: number;
   type: 'inflow' | 'outflow';
@@ -23,7 +23,7 @@ export interface AIInsight {
   type: 'prediction' | 'anomaly' | 'recommendation' | 'general';
   title: string;
   description: string;
-  severity: 'info' | 'warning' | 'critical';
+  severity: 'info' | 'warning' | 'critical' | 'success';
   status: 'active' | 'dismissed' | 'resolved';
   actionLabel?: string;
   impactAmount?: number;
@@ -45,17 +45,53 @@ export interface ForecastPeriod {
   upper: number;
 }
 
-export interface FinancialSummary {
+export interface DashboardOverviewData {
   totalRevenue: number;
   totalExpenses: number;
   netProfit: number;
-  healthScore: number;
+  profitMargin?: number;
   previousRevenue: number;
   previousExpenses: number;
   previousProfit: number;
   runwayMonths: number;
   topExpenseCategory: string;
   topCustomer: string;
+}
+
+export interface DashboardCashFlowPoint {
+  name: string;
+  inflow: number;
+  outflow: number;
+  net: number;
+}
+
+export interface DashboardForecastPoint {
+  name: string;
+  actual: number | null;
+  forecast: number;
+}
+
+export interface DashboardExpenseCategoryPoint {
+  name: string;
+  value: number;
+}
+
+export interface DashboardChartsData {
+  cashFlow: DashboardCashFlowPoint[];
+  forecast: DashboardForecastPoint[];
+  expenseCategories: DashboardExpenseCategoryPoint[];
+}
+
+export interface DashboardHealthData {
+  healthScore: number;
+  healthLabel: string;
+  factors: string[];
+}
+
+export interface FinancialSummary extends DashboardOverviewData {
+  healthScore?: number;
+  healthLabel?: string;
+  healthFactors?: string[];
 }
 
 export interface SystemNotification {

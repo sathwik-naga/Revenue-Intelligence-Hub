@@ -14,13 +14,37 @@ import {
 } from 'recharts';
 import { TrendingUp, ArrowUpRight, Award } from 'lucide-react';
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3.5 shadow-2xl backdrop-blur-md max-w-[260px] text-left">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-450">{label}</p>
+        <div className="mt-2 space-y-1">
+          {payload.map((pld: any, index: number) => (
+            <p key={index} className="text-xs font-semibold text-slate-200 flex items-center justify-between gap-4">
+              <span className="flex items-center gap-1.5 truncate">
+                <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: pld.color || pld.fill }} />
+                {pld.name}:
+              </span>
+              <span className="font-extrabold text-white">
+                {typeof pld.value === 'number' ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(pld.value) : pld.value}
+              </span>
+            </p>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export const RevenueAnalytics: React.FC = () => {
   const { summary, transactions } = useApp();
 
   const fmt = (val: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       maximumFractionDigits: 0
     }).format(val);
   };
@@ -91,7 +115,7 @@ export const RevenueAnalytics: React.FC = () => {
 
           <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={monthlyRevenueData}>
+              <AreaChart data={monthlyRevenueData} margin={{ top: 15, right: 15, left: -20, bottom: 5 }}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15}/>
@@ -99,9 +123,16 @@ export const RevenueAnalytics: React.FC = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" className="dark:stroke-slate-800" />
-                <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <XAxis 
+                  dataKey="month" 
+                  stroke="#94a3b8" 
+                  fontSize={11} 
+                  tickLine={false} 
+                  tickFormatter={(val) => typeof val === 'string' && val.length > 8 ? `${val.slice(0, 6)}...` : val}
+                  minTickGap={15}
+                />
                 <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <Tooltip formatter={(v) => fmt(Number(v))} />
+                <Tooltip content={<CustomTooltip />} />
                 <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -117,10 +148,10 @@ export const RevenueAnalytics: React.FC = () => {
                 <div className="flex items-center justify-center h-full text-xs text-slate-400">No data found</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryData} layout="vertical">
+                  <BarChart data={categoryData} layout="vertical" margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                     <XAxis type="number" stroke="#94a3b8" fontSize={10} hide />
                     <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={10} width={75} tickLine={false} />
-                    <Tooltip formatter={(v) => fmt(Number(v))} />
+                    <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="value" radius={[0, 8, 8, 0]}>
                       {categoryData.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

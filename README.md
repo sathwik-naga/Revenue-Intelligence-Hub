@@ -1,4 +1,4 @@
-# 📊 Revenue Intelligence Hub
+# 📊 Revenue Hub
 
 An AI-powered financial analytics platform that transforms raw business transaction data into actionable financial insights using **Google Gemini AI**, **React**, **FastAPI**, and **Firebase**.
 
@@ -6,7 +6,7 @@ An AI-powered financial analytics platform that transforms raw business transact
 
 ## 🚀 Overview
 
-Revenue Intelligence Hub helps businesses make smarter financial decisions by automatically analyzing transaction data, generating AI-powered financial reports, forecasting cash flow, identifying financial risks, and providing personalized recommendations through an interactive AI financial advisor.
+Revenue Hub helps businesses make smarter financial decisions by automatically analyzing transaction data, generating AI-powered financial reports, forecasting cash flow, identifying financial risks, and providing personalized recommendations through an interactive AI financial advisor.
 
 ---
 

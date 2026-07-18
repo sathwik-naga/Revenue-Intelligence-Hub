@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { motion } from 'framer-motion';
-import { BrainCircuit, Mail, Lock, ShieldCheck, RefreshCw } from 'lucide-react';
+import { BrainCircuit, Mail, Lock, ShieldCheck, RefreshCw, Sparkles } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const { login } = useApp();
@@ -13,7 +13,6 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Perform mock validations
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -34,169 +33,117 @@ export const Login: React.FC = () => {
     }
 
     setLoading(true);
-try {
-  const success = await login(email,password);
-
-  if (success) {
-    navigate('/');
-  }
-} catch (err) {
-  setError('Invalid credentials or Firebase network timeout.');
-} finally {
-  setLoading(false);
-}
+    try {
+      const success = await login(email, password);
+      if (success) navigate('/dashboard');
+    } catch {
+      setError('Invalid credentials or Firebase network timeout.');
+    } finally {
+      setLoading(false);
+    }
   };
 
- const handleDemoLogin = async () => {
-  setLoading(true);
-
-  try {
-    const success = await login(
-      "admin@revenuehub.com",
-      "admin123"
-    );
-
-    if (success) {
-      navigate("/");
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    try {
+      const success = await login('admin@revenuehub.com', 'admin123');
+      if (success) navigate('/dashboard');
+    } catch {
+      setError('Failed to load demo workspace.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError("Failed to load demo workspace.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950 overflow-hidden">
-      {/* Decorative background shapes */}
-      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-500/10 blur-[120px] dark:bg-blue-600/5 animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-emerald-500/5 blur-[100px] dark:bg-emerald-600/5" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(139,92,246,0.16),_transparent_28%),linear-gradient(135deg,_#030712_0%,_#0b1220_100%)] p-4">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:70px_70px] opacity-40" />
 
-      <motion.div
-        initial={{ opacity: 0, y: 25 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <div className="text-center mb-8">
-          <div className="inline-flex h-12 w-12 bg-blue-600 rounded-2xl items-center justify-center shadow-lg shadow-blue-500/20 mb-3.5">
-            <BrainCircuit className="text-white" size={24} />
+      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="relative z-10 grid w-full max-w-6xl gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="glass-panel flex flex-col justify-between rounded-[32px] p-8 sm:p-10">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
+              <Sparkles size={14} />
+              Revenue Glass Enterprise
+            </div>
+            <h1 className="mt-6 text-4xl font-semibold tracking-tight text-slate-50 sm:text-5xl">
+              Command your revenue operations with calm precision.
+            </h1>
+            <p className="mt-4 max-w-xl text-base leading-7 text-slate-400">
+              A premium operating system for finance teams that blends AI insight, cash visibility, and elegant execution.
+            </p>
           </div>
-          <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            Revenue Intelligence Hub
-          </h2>
-          <p className="text-sm font-semibold text-slate-400 mt-1 dark:text-slate-500">
-            AI Financial Co-Pilot for Growing SMEs
-          </p>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {[
+              ['Live AI co-pilot', 'Instant analysis and forecasts'],
+              ['Zero-friction import', 'CSV-ledger onboarding in minutes']
+            ].map(([title, body]) => (
+              <div key={title} className="rounded-[22px] border border-white/10 bg-white/8 p-4">
+                <p className="text-sm font-semibold text-slate-100">{title}</p>
+                <p className="mt-1 text-sm text-slate-400">{body}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Glassmorphic Auth card */}
-        <div className="border border-slate-200/80 dark:border-slate-800 bg-white/75 dark:bg-slate-900/50 backdrop-blur-lg rounded-2xl shadow-xl p-8">
-          {error && (
-            <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 rounded-xl text-rose-600 dark:text-rose-450 text-xs font-semibold">
-              {error}
+        <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1, duration: 0.45 }} className="glass-panel rounded-[32px] p-6 sm:p-8">
+          <div className="mb-6 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[22px] bg-gradient-to-br from-blue-500 via-cyan-400 to-violet-500 shadow-[0_12px_40px_rgba(59,130,246,0.25)]">
+              <BrainCircuit className="text-white" size={24} />
             </div>
+            <h2 className="mt-4 text-2xl font-semibold text-slate-50">Welcome back</h2>
+            <p className="mt-2 text-sm text-slate-400">Sign in to your Revenue workspace.</p>
+          </div>
+
+          {error && (
+            <div className="mb-4 rounded-[18px] border border-rose-400/20 bg-rose-500/10 p-3 text-sm text-rose-300">{error}</div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                Business Email
-              </label>
+              <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500">Business email</label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                  <Mail size={16} />
-                </span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
-                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  disabled={loading}
-                />
+                <Mail size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" className="premium-input pl-10" disabled={loading} />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                Password
-              </label>
+              <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500">Password</label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                  <Lock size={16} />
-                </span>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  disabled={loading}
-                />
+                <Lock size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="premium-input pl-10" disabled={loading} />
               </div>
             </div>
 
-            <div className="flex items-center justify-between py-1 text-xs">
-              <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-500 dark:text-slate-400">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded border-slate-200 text-blue-600 focus:ring-blue-500"
-                />
-                Remember this device
+            <div className="flex items-center justify-between text-sm text-slate-400">
+              <label className="flex items-center gap-2">
+                <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="rounded border-white/10 bg-white/10 text-cyan-400" />
+                Remember device
               </label>
-              <a
-                href="#forgot"
-                className="font-bold text-blue-600 dark:text-blue-450 hover:underline"
-              >
-                Forgot details?
-              </a>
+              <a href="#forgot" className="text-cyan-300 transition hover:text-cyan-200">Forgot details?</a>
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-blue-500/10 flex items-center justify-center gap-2"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <RefreshCw size={16} className="animate-spin" />
-                  Authenticating...
-                </>
-              ) : (
-                'Sign In'
-              )}
+            <button type="submit" className="premium-button w-full" disabled={loading}>
+              {loading ? <><RefreshCw size={16} className="animate-spin" />Authenticating...</> : 'Sign in'}
             </button>
 
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
-              <span className="flex-shrink mx-4 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                Or Continue With
-              </span>
-              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+            <div className="flex items-center gap-3 py-2">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Or continue with</span>
+              <div className="h-px flex-1 bg-white/10" />
             </div>
 
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              className="w-full py-2.5 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 transition-all flex items-center justify-center gap-2"
-              disabled={loading}
-            >
-              <ShieldCheck size={16} className="text-emerald-500" />
-              Access Demo Workspace
+            <button type="button" onClick={handleDemoLogin} className="flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/10 bg-white/8 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/12" disabled={loading}>
+              <ShieldCheck size={16} className="text-emerald-300" />
+              Access demo workspace
             </button>
           </form>
-        </div>
-
-        <p className="text-center text-xs text-slate-400 mt-6 font-medium">
-          Hackathon Submission: Finance & Business Management Theme.
-          <br />
-          Built with React 19, TypeScript, and Google Gemini.
-        </p>
+        </motion.div>
       </motion.div>
     </div>
   );
 };
+
 export default Login;

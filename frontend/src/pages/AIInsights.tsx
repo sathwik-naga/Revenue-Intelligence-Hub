@@ -16,18 +16,43 @@ import {
 } from 'lucide-react';
 import { ResponsiveContainer, LineChart as RechartsLine, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3.5 shadow-2xl backdrop-blur-md max-w-[260px] text-left">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-450">{label}</p>
+        <div className="mt-2 space-y-1">
+          {payload.map((pld: any, index: number) => (
+            <p key={index} className="text-xs font-semibold text-slate-200 flex items-center justify-between gap-4">
+              <span className="flex items-center gap-1.5 truncate">
+                <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: pld.color || pld.fill }} />
+                {pld.name}:
+              </span>
+              <span className="font-extrabold text-white">
+                {typeof pld.value === 'number' ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(pld.value) : pld.value}
+              </span>
+            </p>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export const AIInsights: React.FC = () => {
   const {
-  insights,
-  insightsText,
-  insightsLoading,
-  insightsConfidence,
-  chatMessages,
-  chatLoading,
-  askQuestion,
-  refreshAnalysis,
-  summary
-} = useApp();
+    insights,
+    insightsText,
+    insightsLoading,
+    insightsConfidence,
+    insightsError,
+    chatMessages,
+    chatLoading,
+    askQuestion,
+    refreshAnalysis,
+    summary
+  } = useApp();
 
   const [questionInput, setQuestionInput] = useState('');
   const chatBottomRef = useRef<HTMLDivElement>(null);
@@ -48,13 +73,7 @@ export const AIInsights: React.FC = () => {
     askQuestion(suggestion);
   };
 
-  const fmt = (val: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0
-    }).format(val);
-  };
+
 
   // Compile monthly future forecast mock data
   const forecastData = [
@@ -93,6 +112,37 @@ export const AIInsights: React.FC = () => {
           Re-Analyze Accounts
         </button>
       </div>
+
+      {insightsError && (
+        <div className="p-6 border border-rose-500/20 bg-rose-500/5 rounded-2xl space-y-4 text-left">
+          <div className="flex items-start gap-3">
+            <span className="p-2 bg-rose-500/20 text-rose-400 rounded-xl text-lg shrink-0">⚠️</span>
+            <div className="space-y-1">
+              <h4 className="font-extrabold text-sm text-white">AI Insights Temporarily Unavailable</h4>
+              <p className="text-xs text-slate-400">The AI service is currently unavailable.</p>
+            </div>
+          </div>
+          <div className="text-[11px] text-slate-400 space-y-1 pl-11">
+            <p className="font-bold text-slate-350">Possible reasons:</p>
+            <ul className="list-disc pl-4 space-y-0.5">
+              <li>Model unavailable</li>
+              <li>API quota reached</li>
+              <li>Temporary backend issue</li>
+            </ul>
+          </div>
+          <div className="pl-11 pt-1">
+            <button
+              onClick={() => {
+                console.error("Technical error details:", insightsError);
+                refreshAnalysis();
+              }}
+              className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl text-xs font-bold transition cursor-pointer"
+            >
+              Retry Analysis
+            </button>
+          </div>
+        </div>
+      )}
 
       {insightsLoading ? (
         <div className="flex flex-col items-center justify-center p-24 bg-white/70 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-4 animate-pulse">
@@ -156,11 +206,18 @@ export const AIInsights: React.FC = () => {
               </div>
               <div className="h-60 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RechartsLine data={forecastData}>
+                  <RechartsLine data={forecastData} margin={{ top: 15, right: 15, left: -20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" className="dark:stroke-slate-800" />
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="#94a3b8" 
+                      fontSize={11} 
+                      tickLine={false} 
+                      tickFormatter={(val) => typeof val === 'string' && val.length > 8 ? `${val.slice(0, 6)}...` : val}
+                      minTickGap={15}
+                    />
                     <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
-                    <Tooltip formatter={(v) => fmt(Number(v))} />
+                    <Tooltip content={<CustomTooltip />} />
                     <Line type="monotone" dataKey="revenue" stroke="#356fe6" strokeWidth={3} dot={{ stroke: '#2563EB', strokeWidth: 2, r: 4 }} />
                   </RechartsLine>
                 </ResponsiveContainer>

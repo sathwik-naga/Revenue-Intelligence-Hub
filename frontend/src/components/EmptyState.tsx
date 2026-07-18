@@ -17,24 +17,15 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   icon: Icon = Database
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center border border-dashed border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-900/10 backdrop-blur-sm rounded-2xl p-12 text-center max-w-lg mx-auto my-6">
-      <div className="p-4 bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 rounded-2xl mb-4">
-        <Icon size={32} className="stroke-[1.5px]" />
+    <div className="glass-panel mx-auto my-6 flex max-w-xl flex-col items-center justify-center rounded-[32px] p-12 text-center">
+      <div className="mb-5 rounded-[24px] border border-white/10 bg-gradient-to-br from-blue-500/20 to-cyan-400/20 p-4 text-cyan-300">
+        <Icon size={30} />
       </div>
-      
-      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-        {title}
-      </h3>
-      
-      <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6 max-w-sm">
-        {description}
-      </p>
+      <h3 className="text-xl font-semibold text-slate-50">{title}</h3>
+      <p className="mt-3 max-w-sm text-sm leading-6 text-slate-400">{description}</p>
 
       {actionLabel && onAction && (
-        <button
-          onClick={onAction}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow"
-        >
+        <button onClick={onAction} className="premium-button mt-6">
           <Plus size={16} />
           {actionLabel}
         </button>
@@ -42,4 +33,5 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     </div>
   );
 };
+
 export default EmptyState;
