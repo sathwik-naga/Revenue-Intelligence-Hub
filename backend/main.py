@@ -90,6 +90,17 @@ def validate_environment():
 # Execute startup check
 validate_environment()
 
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/api/health")
+async def health():
+    return {
+        "status": "healthy",
+        "message": "Revenue Hub Backend is running"
+    }
+
 # Initialize FastAPI application
 app = FastAPI(
     title="Revenue Hub API",
