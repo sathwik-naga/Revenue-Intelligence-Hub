@@ -7,26 +7,26 @@ from utils.logging import logger
 
 db = None
 
+
 def initialize_firebase():
     global db
-    
-    # 1. Check if Firebase has already been initialized:
+
     if firebase_admin._apps:
         if db is None and not settings.DEVELOPMENT_MOCK:
             try:
                 db = firestore.client()
-            except Exception as e:
-                print(f"Error getting Firestore client: {e}", flush=True)
+            except Exception as exc:
+                logger.exception("Error getting Firestore client: %s", exc)
         return
-        
+
     is_mock = settings.DEVELOPMENT_MOCK
-    
+
     if is_mock:
-        print("Using Service Account:\nFalse\n", flush=True)
-        print("Using Mock Firestore:\nTrue\n", flush=True)
-        
+        logger.info("Using Service Account: False")
+        logger.info("Using Mock Firestore: True")
+
         import uuid
-        
+
         class MockDocumentReference:
             def __init__(self, client, collection_name, doc_id=None):
                 self.client = client
@@ -63,9 +63,10 @@ def initialize_firebase():
                         self.id = doc_ref.id
                         self.exists = data is not None
                         self._data = data
+
                     def to_dict(self):
                         return dict(self._data) if self._data else {}
-                
+
                 data = None
                 if self.collection_name in self.client._store and self.id in self.client._store[self.collection_name]:
                     data = self.client._store[self.collection_name][self.id]
@@ -149,96 +150,95 @@ def initialize_firebase():
                 return MockBatch(self)
 
         db = MockFirestoreClient()
-        print("Firebase Admin SDK initialized successfully.\n", flush=True)
-        print("Firestore connected successfully.\n", flush=True)
+        logger.info("Firebase Admin SDK initialized successfully (mock mode).")
+        logger.info("Firestore connected successfully (mock mode).")
         return
 
-    # Real mode validations & initialization
     cred_path = settings.GOOGLE_APPLICATION_CREDENTIALS
-    
+
     if cred_path:
-        # Resolve relative and absolute paths relative to backend directory
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         if not os.path.isabs(cred_path):
             service_account_path = os.path.abspath(os.path.join(base_dir, cred_path))
         else:
             service_account_path = os.path.abspath(cred_path)
-            
+
         logger.info("Using Service Account: True")
-        logger.info(f"GOOGLE_APPLICATION_CREDENTIALS: {service_account_path}")
-        
-        # Verify the service account file exists:
+        logger.info("GOOGLE_APPLICATION_CREDENTIALS: %s", service_account_path)
+
         if not os.path.exists(service_account_path):
-            raise RuntimeError(
-                f"Firebase service account not found: {service_account_path}"
-            )
-            
-        # Validate the JSON before calling firebase_admin.initialize_app()
+            raise RuntimeError(f"Firebase service account not found: {service_account_path}")
+
         try:
-            with open(service_account_path, "r") as f:
-                cred_json = json.load(f)
+            with open(service_account_path, "r", encoding="utf-8") as handle:
+                cred_json = json.load(handle)
         except json.JSONDecodeError as jde:
-            logger.error("✗ Invalid Firebase service account JSON.")
-            raise ValueError(f"Configuration Error: Invalid JSON in service account key file: {str(jde)}")
-            
-        # Validate required fields
+            logger.error("Invalid Firebase service account JSON.")
+            raise ValueError(f"Configuration Error: Invalid JSON in service account key file: {str(jde)}") from jde
+
         required_keys = ["project_id", "private_key", "client_email"]
-        for key in required_keys:
-            if key not in cred_json or not cred_json[key]:
-                raise ValueError(f"Configuration Error: Missing or empty required service account key: {key}")
-                
-        # Initialize
+        missing_keys = [key for key in required_keys if not cred_json.get(key)]
+        if missing_keys:
+            logger.error("Missing required Firebase service account fields: %s", ", ".join(missing_keys))
+            raise ValueError("Configuration Error: Missing or empty required service account key fields.")
+
         try:
             cred = credentials.Certificate(service_account_path)
-            firebase_admin.initialize_app(cred, {
-                'storageBucket': settings.FIREBASE_STORAGE_BUCKET
-            })
+            if not firebase_admin._apps:
+                firebase_admin.initialize_app(cred, {"storageBucket": settings.FIREBASE_STORAGE_BUCKET})
             logger.info("✓ Firebase credentials loaded from service account JSON.")
             logger.info("Firebase Admin SDK initialized successfully.")
         except Exception:
-            logger.error("✗ Invalid Firebase credentials.")
+            logger.error("Invalid Firebase credentials for service account file.")
             logger.exception("Firebase Admin SDK initialization failed")
             raise
     else:
-        # Priority 2: Initialize with environment variables
         logger.info("Using Service Account: False (Environment Variables)")
-        project_id = settings.FIREBASE_PROJECT_ID
-        client_email = settings.FIREBASE_CLIENT_EMAIL
-        private_key = settings.FIREBASE_PRIVATE_KEY
-        
-        if not project_id or not client_email or not private_key:
+
+        project_id = (settings.FIREBASE_PROJECT_ID or "").strip()
+        client_email = (settings.FIREBASE_CLIENT_EMAIL or "").strip()
+        private_key = (settings.FIREBASE_PRIVATE_KEY or "").strip()
+
+        missing_env = []
+        if not project_id:
+            missing_env.append("FIREBASE_PROJECT_ID")
+        if not client_email:
+            missing_env.append("FIREBASE_CLIENT_EMAIL")
+        if not private_key:
+            missing_env.append("FIREBASE_PRIVATE_KEY")
+
+        if missing_env:
+            logger.error("Missing required Firebase environment variables: %s", ", ".join(missing_env))
             raise ValueError("Configuration Error: Firebase environment variables are incomplete.")
-            
+
+        private_key = private_key.replace("\\n", "\n")
+
         try:
-            # Reconstruct the credentials structure
             cred_info = {
                 "type": "service_account",
                 "project_id": project_id,
                 "private_key": private_key,
                 "client_email": client_email,
-                "token_uri": "https://oauth2.googleapis.com/token"
+                "token_uri": "https://oauth2.googleapis.com/token",
             }
             cred = credentials.Certificate(cred_info)
-            firebase_admin.initialize_app(cred, {
-                'storageBucket': settings.FIREBASE_STORAGE_BUCKET
-            })
+            if not firebase_admin._apps:
+                firebase_admin.initialize_app(cred, {"storageBucket": settings.FIREBASE_STORAGE_BUCKET})
             logger.info("✓ Firebase credentials loaded from environment variables.")
             logger.info("Firebase Admin SDK initialized successfully.")
         except Exception:
-            logger.error("✗ Invalid Firebase credentials.")
+            logger.error("Invalid Firebase credentials from environment variables.")
             logger.exception("Firebase Admin SDK initialization failed")
             raise
 
-    # Verify real Firestore connection
     try:
         db = firestore.client()
-        # Verify connectivity using a lightweight query. 
-        # Querying an empty collection is handled gracefully (returns empty QuerySnapshot list, no exception).
         db.collection("users").limit(1).get()
         logger.info("Firestore connected successfully.")
     except Exception:
         logger.exception("Firestore connection verification failed")
         raise
+
 
 def get_firestore():
     global db

@@ -22,3 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Firebase service account
+backend/serviceAccountKey.json
+
+# Environment files
+.env
+*.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Python
+__pycache__/
+*.pyc
+
+# Firebase secrets
+backend/serviceAccountKey.json
+*.json
